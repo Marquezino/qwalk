@@ -1,0 +1,10 @@
+Some users are having difficulties to run QWalk simulator on Windows. In fact, the documentation is not very clear on that point. Mea culpa.
+
+The problem is caused by the user double-clicking on the executable file in order to open a graphical user interface (GUI). Such an interface does not exist in current versions of QWalk, so double-clicking on the executable file actually does not work.
+
+Instead of double-clicking on the executable file, the user should first open the Command Prompt. Then, he or she should use the 'cd' command to access the directory where QWalk was installed. For example, if QWalk 1.2 is saved under the Documents directory, the user shoud type 'cd Documents' and then 'cd qwalk-1.2-win'. Once in the correct directory the user should call the simulator and pass the name of the input file, for instance, by typing 'qw2d hadamard.in'.
+
+I apologize for the lack of information. This procedure will be better explained in the documentation when we release the next version of QWalk. If there are still further questions, please feel free to send me an email.
+
+F.L. Marquezino
+June, 19th, 2008.
