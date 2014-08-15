@@ -1,0 +1,32 @@
+
+QWalk 1.4 - Quantum Walk Simulator
+----------------------------------
+
+To compile the source files in Linux (or similar operating systems):
+
+1. Type the commands
+      cd src
+      make 
+
+2. If you want to clean the object files after compiling, type the command
+      make clean
+
+3. If you want to generate a PostScript file with the code listing, type
+      make doc
+
+4. It may be useful to add a path to the bin directory. There may be
+   different ways of doing this. If you use bash, for instance, you may
+   add the lines 
+      PATH=$PATH:$HOME/qwalk/bin
+      export PATH
+   to the file .bash_profile in your home directory and log in again. If
+   you do not want to do this, you should type the correct path when running
+   the simulator, e.g., ../bin/qw2d if you are in the "examples" directory.
+
+To compile the source files in Windows you may use the Dev-C++ projects 
+present in this distribution with the Dev-C++ compiler, which is 
+available for free in Internet (http://www.bloodshed.net/); or you may
+use the compiler of your preference. Pre-compiled versions are also
+provided in the web-site where you probably downloaded this file 
+(http://qubit.lncc.br/qwalk/). 
+

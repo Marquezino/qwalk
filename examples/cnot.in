@@ -1,0 +1,30 @@
+BEGIN 
+ COIN CUSTOM
+ STATE FOURIER
+ CHECK STATEPROB 
+ LATTYPE DIAGONAL
+ STEPS 100 
+END 
+
+BEGINCOIN
+ 1.0  0.0
+ 0.0  0.0
+ 0.0  0.0
+ 0.0  0.0
+
+ 0.0  0.0
+ 1.0  0.0
+ 0.0  0.0
+ 0.0  0.0
+
+ 0.0  0.0
+ 0.0  0.0
+ 0.0  0.0
+ 1.0  0.0
+
+ 0.0  0.0
+ 0.0  0.0
+ 1.0  0.0
+ 0.0  0.0
+ENDCOIN
+

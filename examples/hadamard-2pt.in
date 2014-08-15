@@ -1,0 +1,26 @@
+BEGIN
+COIN HADAMARD
+STATE CUSTOM
+LATTYPE DIAGONAL
+LATTEXTRA 7
+STEPS 100
+END
+
+If you don't provide all the numbers with a certain accuracy, 
+the simulator may consider the state non-unitary. Here, I have
+used 1/sqrt(8) with 8 decimal places, which is provided by any 
+reasonable pocket calculator. In later versions perhaps we
+could allow the user to enter simple expressions in the input
+file. But not yet...
+
+BEGINSTATE
+ 0 0 -6  0  0.35355339   0.0
+ 0 1 -6  0  0.0           0.35355339
+ 1 0 -6  0  0.0          -0.35355339
+ 1 1 -6  0  0.35355339   0.0
+ 0 0  6  0  0.35355339   0.0
+ 0 1  6  0  0.0           0.35355339
+ 1 0  6  0  0.0          -0.35355339
+ 1 1  6  0  0.35355339   0.0
+ENDSTATE
+

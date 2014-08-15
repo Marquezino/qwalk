@@ -1,0 +1,109 @@
+
+QWalk 1.4 - Quantum Walk Simulator
+----------------------------------
+
+
+
+1) THIS software has the following structure of directories:
+
+ /bin - contains the executable files
+ /src - contains the source code of the simulator
+ /lib - contains the library and object files generated after make
+ /include - contains the header files
+ /examples - some examples that can be run after installing the simulator
+ /doc - documentation (code listing and articles)
+
+
+
+2) AFTER running make we have in bin directory:
+
+ qw1d - performs simulations of quantum walks on one-dimensional lattices
+ qw2d - performs simulations of quantum walks on bi-dimensional lattices
+ qwamplify - ampliflies some regions of wave function
+
+
+
+3) IN src directory we have:
+
+ Makefile 
+
+ (files with the main functions)
+ qw1d.c
+ qw2d.c       
+ qwamplify.c  
+
+ (files with important functions used in qw1d.c and qw2d.c)
+ qw1d_sub.c
+ qw2d_sub.c
+
+ (files for memory management)
+ qwmem_int.c
+ qwmem_real.c
+ qwmem_complex.c
+
+ (core files)
+ qwcoin.c     
+ qwlinks.c     
+ qwscreen.c   
+ qwstatistics.c
+ qwmeasure.c   
+ qwprob.c             
+ qwstate.c    
+
+ (files for input and output)
+ qwextra_io.c
+ qwoptions_io.c
+ qwoptions_io_read.c
+ qwprob_io.c
+ qwstate_io.c
+ qwcoin_io.c
+ qwstatistics_io.c
+
+
+
+4) IMPORTANT: If you change any of the source files, add comments saying what 
+   functions you have changed and rename the main directory (for instance, 
+   from qwalk-1.4 to something like myQwalk, or qwalk_tmp, etc).
+
+
+
+5) AFTER running make we have in lib directory:
+
+ libqwalk.a
+ object files ending with .o
+ 
+
+
+6) IN include directory, we have:
+
+ qw1d_sub.h
+ qw2d_sub.h
+ qwamplify.h
+
+ qwmem_complex.h
+ qwmem_int.h
+ qwmem_real.h
+
+ qwcoin.h
+ qwscreen.h
+ qwstatistics.h 
+ qwprob.h
+ qwstate.h
+ qwlinks.h
+ qwconsts.h
+ qwmeasure.h
+
+ qwcoin_io.h
+ qwprob_io.h
+ qwstate_io.h
+ qwextra_io.h
+ qwstatistics_io.h
+ qwoptions_io.h
+ qwoptions_io_read.h
+
+
+
+7) IMPORTANT: If you change any of the header files, add comments saying what
+   you have changed and rename the main directory (for instance, from qwalk-1.4 
+   to something like myQwalk, or qwalk_tmp, etc).
+

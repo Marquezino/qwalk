@@ -1,0 +1,10 @@
+A simple experiment with Fourier coin, as in Fig. 3 from
+Physical Review A, 74 (2006).
+
+BEGIN
+COIN FOURIER
+STATE FOURIER
+LATTYPE DIAGONAL
+STEPS 100
+END
+

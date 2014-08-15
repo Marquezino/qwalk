@@ -1,0 +1,26 @@
+Double slit experiment with wall placed parallel to the secondary diagonal.
+Also, a detector as declared close to one of the slits. We also have here 
+an example of the 'SEED' keyword: the output will be aways the same.
+
+Franklin de Lima Marquezino
+March, 4, 2007.
+
+BEGIN
+COIN GROVER
+STATE GROVER
+LATTYPE DIAGONAL
+STEPS 100
+SCREEN 20 -100 100 -20
+DETECTORS 1 15 -27
+EXPERIMENTS 10
+CHECK STATEPROB
+BLPERMANENT
+SEED 1190726780
+END
+
+BEGINBL
+LINE -60 -100 12 -28
+LINE 16 -24 24 -16
+LINE 28 -12 100 60
+ENDBL
+

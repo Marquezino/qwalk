@@ -1,0 +1,18 @@
+Double slit experiment with observation screen placed
+far away from the slits
+
+BEGIN
+COIN HADAMARD
+STATE HADAMARD
+LATTYPE DIAGONAL
+STEPS 800
+SCREEN 500 -800 500 800
+BLPERMANENT
+END
+
+BEGINBL
+LINE 20 800 20 7
+LINE 20 5 20 -5
+LINE 20 -7 20 -800
+ENDBL
+

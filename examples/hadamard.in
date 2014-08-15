@@ -1,0 +1,11 @@
+A simple experiment with Hadamard coin, as in Fig. 2 from
+Physical Review A, 74 (2006).
+
+BEGIN 
+ COIN HADAMARD
+ STATE HADAMARD
+ LATTYPE DIAGONAL
+ CHECK STATEPROB 
+ STEPS 100 
+END 
+

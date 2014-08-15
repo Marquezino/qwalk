@@ -1,0 +1,141 @@
+
+Help file for 1D simulations
+----------------------------
+
+That's an input file for the simulator of quantum walks. The simulator
+ignore all the text before the 'BEGIN' keyword (without quotes), and
+reads until it finds an 'END' keyword. The possible keywords in this
+version are:
+
+  AFTERMEASURE: defines the number of steps that will be simulated after
+     the result of the measurement is one of the detectors, that is, the
+     number of steps after a non-trivial measurement.
+     Default: 0
+
+  BLPROB: defines the probability of broken links in the simulation, i.e.,
+     in each simulation step each link has this probability of being open.
+     Default: 0.0
+
+  CHECK: can be STATEPROB, SYMMETRY
+     STATEPROB makes the simulator test in each step if the probability 
+     of finding the particle in the lattice equals one.
+     SYMMETRY makes the simulator test the symmetry of the probability 
+     matrix around y axys in each step, i.e., the simulator tests
+     if the probabilities at the sites x<0 are equal to the probabilities
+     at the sites x>0. If at some step the array is not symmetrical, the 
+     simulation is aborted. Therefore, if you know a priori that the 
+     wave-equation should be symmetrical, you can use this option to be 
+     safer about the result.
+     Default: no check
+
+  COIN: can be CUSTOM or HADAMARD
+     CUSTOM requires the definition of the coin in a separate section.
+     Default: HADAMARD
+
+  DETECTORS: defines the number of detectors and their position. The first
+     integer passed after this keyword is the number of detectors in the
+     simulation. For each detector one integer must be provided,defining 
+     the position of the detector. For instance, if we want to define 
+     detectors on points x=20 and x=-10, we say DETECTORS 2 20 -10
+     Default: no detectors
+
+  DTPROB: defines the probability of random measurements in the simulation, i.e., 
+     in each simulation step each site has this probability of being measured.
+     Default: 0.0
+
+  EXPERIMENTS: defines the number of experiments that will be carried out.
+     The results are the average of the experiments.
+     Default: 1
+
+  LATTEXTRA: defines an extra space to be reserved for the lattice, in order
+     to avoid that the simulator access invalid regions of memory. It
+     is usually safe to leave this options with its default value. On
+     the other hand, this options would be important, for instance, if
+     the initial condition was not entirely localized in x=0. If the 
+     keywords STEPS and LATTSIZE are also used, LATTEXTRA must come
+     first.
+     Default: 1
+
+  LATTSIZE: defines the size of the lattice. We consider that the lattice
+     coordinates range from -max to max, where max is the integer value 
+     passed after LATTSIZE keyword. If the keywords STEPS or  LATTEXTRA are 
+     also used, LATTSIZE must come after them.
+     Default: 101
+
+  LATTYPE: defines the type of lattice. Can be LINE, CYCLE or SEGMENT.
+     Default: LINE
+
+  MIXTIME: declares that the mixing time is to be calculated at the beginning
+     of the simulation, with a certain number of steps (this number must be
+     passed after the MIXTIME keyword as an integer greater of equal than
+     the number of steps simulated).
+
+  SEED: sets the seed of random number generator manually. This is useful
+     if we want to repeat a random experiment and obtain exactly the same
+     results (in order to generate the same plot again, for instance).
+     The user should usually leave this option with its default value.
+     Default: taken from the system clock.
+
+  STATE: can be CUSTOM or HADAMARD
+     HADAMARD defines the initial state which gives maximum spread with
+     Hadamard coin. CUSTOM requires the definition of the state in a 
+     separate section.
+     Default: HADAMARD
+
+  STEPS: defines the number of iterations to simulate. If keywords LATTEXTRA
+     or LATTSIZE are also used, STEPS must come after LATTEXTRA and
+     before LATTSIZE.
+     Default: 100
+
+
+We see below an example of how these keywords can be used. Note, however, 
+that in many useful simulations you will not need to provide all those 
+keywords.
+
+BEGIN
+ COIN CUSTOM
+ STATE CUSTOM
+ LATTYPE SEGMENT
+ LATTEXTRA 2
+ STEPS 1000
+ MIXTIME 2000
+ LATTSIZE 102
+ BLPROB 0.01
+ DTPROB 0.01
+ EXPERIMENTS 1000
+ DETECTORS 2 20 -10
+ AFTERMEASURE 30
+ CHECK STATEPROB
+ SEED 1179235731
+END
+
+If we choose a CUSTOM coin, we must specify that matrix by using the
+keywords 'BEGINCOIN' and 'ENDCOIN' (without quotes). Inside this 
+environment we give each entry of the matrix, starting with the first
+line and going from left to right. We must give first the real part of
+the entry and then the imaginary part, separated by a blank. Although
+we could provide the whole matrix in a single line, it may be easier to
+read, for example, if we give each entry of the matrix in different lines
+of the input file.
+
+BEGINCOIN
+ 0.707106781186 0.0
+ 0.0 0.707106781186
+
+ 0.0 0.707106781186
+ 0.707106781186 0.0
+ENDCOIN
+
+
+If we choose a CUSTOM state, we must specify that state by using the
+keywords 'BEGINSTATE' and 'ENDSTATE' (without quotes). Inside this
+environment we give each non-zero amplitude of the state. The first
+integer represent the coin. The next integers represent the position 
+of the walker. The next two real numbers represent the amplitude (real 
+and imaginary parts).  Although we could provide the whole state in a 
+single line, it is better for visualisation if we give each non-zero 
+entry of the state in different lines of the input file.
+
+BEGINSTATE
+ 1 0 0.0 1.0
+ENDSTATE

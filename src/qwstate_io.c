@@ -1,0 +1,358 @@
+/* QWalk (qwstate_io.c) 
+ * Copyright (C) 2008  Franklin Marquezino
+ *                                                                                                                           
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *                                                                                                                           
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+ * 02110-1301, USA
+ */
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<complex.h>
+#include<string.h>
+#include<math.h>
+#include<limits.h>
+#include<time.h>
+#include "qwmem_complex.h"
+#include "qwstate_io.h"
+#include "qwconsts.h"
+
+
+double complex **readStateFile1D(const char *filename, int max, unsigned int lattType){
+  FILE *in;
+  double complex **state;
+  int j,m;
+  double real, imag;
+  char keyword[100];
+
+  in = fopen(filename,"rt");
+  if(!in)
+    return NULL;
+
+  /* First we search the BEGINSTATE keyword,...*/ 
+  do{
+    fscanf(in,"%s",keyword);
+  }while(STRNEQ(keyword,"BEGINSTATE") && !feof(in));
+
+  if(feof(in))
+    return NULL;
+
+  state = (lattType == LINE_LATT) ?
+    allocComplex2D(2, 2*max+1) : allocComplex2D(2, max);
+  if(!state)
+    return NULL;
+
+  if(lattType == LINE_LATT)
+    cleanComplex2D(state, 2, 2*max+1);
+  else
+    cleanComplex2D(state, 2, max);
+
+  /* ...when we find it we start reading integer numbers, describing 
+   * the "kets", and complex numbers, describing the amplitudes. 
+   * Then, we assign each complex amplitude to the corresponding 
+   * entry of the complex matrix. The complex numbers must be 
+   * given in the input file with the real and imaginary parts 
+   * separated by a space. The amplitudes of those "kets" not 
+   * described in the input file are all zero by default.
+   */  
+  fscanf(in,"%s",keyword);
+  while(STRNEQ(keyword,"ENDSTATE") && !feof(in)){
+    sscanf(keyword,"%d", &j);
+    fscanf(in,"%d", &m);
+    fscanf(in,"%lf", &real);
+    fscanf(in,"%lf", &imag);
+    if(j!=-1){
+      if(lattType == LINE_LATT)
+	state[j][max+m] = real+ I*imag;
+      else
+	state[j][m] = real+ I*imag;      
+
+      fscanf(in,"%s",keyword);
+    }
+    else{
+      printf("Warning: Closing BEGINSTATE with -1 is deprecated.");
+      printf(" Use ENDSTATE instead.\n");
+      strcpy(keyword,"ENDSTATE");
+    }
+
+  }
+  
+  fclose(in);
+  return state;
+}
+
+
+
+double complex ****readStateFile2D(const char *filename, int max, unsigned int lattType){
+  FILE *in;
+  double complex ****state;
+  int j,k,m,n;
+  double real, imag;
+  char keyword[100];
+  const int auxsize = (lattType == CYCLE_LATT) ? max : 2*max+1;
+
+  in = fopen(filename,"rt");
+  if(!in)
+    return NULL;
+
+  /* First we search the BEGINSTATE keyword,...*/
+  do{
+    fscanf(in,"%s",keyword);
+  }while(STRNEQ(keyword,"BEGINSTATE") && !feof(in));
+
+  if(feof(in))
+    return NULL;
+
+  state = allocComplex4D(2, 2, auxsize, auxsize);
+  if(!state)
+    return NULL;
+
+  cleanComplex4D(state, 2, 2, auxsize, auxsize);
+
+
+  /* ...when we find it we start reading integer numbers, describing 
+   * the "kets", and complex numbers, describing the amplitudes. 
+   * Then, we assign each complex amplitude to the corresponding 
+   * entry of the complex matrix. The complex numbers must be 
+   * given in the input file with the real and imaginary parts 
+   * separated by a space. The amplitudes of those "kets" not 
+   * described in the input file are all zero by default.
+   */  
+  fscanf(in,"%s",keyword);
+  while(STRNEQ(keyword,"ENDSTATE") && !feof(in)){
+    sscanf(keyword,"%d", &j);
+    fscanf(in,"%d", &k);
+    fscanf(in,"%d", &m);
+    fscanf(in,"%d", &n);
+    fscanf(in,"%lf", &real);
+    fscanf(in,"%lf", &imag);
+
+    if(j!=-1 && k!=-1){
+      int auxm = (lattType == CYCLE_LATT) ? m : max+m;
+      int auxn = (lattType == CYCLE_LATT) ? n : max+n;
+
+      state[j][k][auxm][auxn] = real+ I*imag;
+      fscanf(in,"%s",keyword);
+    }
+    else{
+      printf("Warning: Closing BEGINSTATE with -1 is deprecated.");
+      printf(" Use ENDSTATE instead.\n");
+      strcpy(keyword,"ENDSTATE");
+    }
+
+  }
+
+  fclose(in);
+  return state;
+}
+
+int writeState1D(const char *filename, double complex **wave, options1D_t options){
+  FILE *out;
+  int m,j;
+  time_t lt;
+  const int MAX = options.max;
+
+  out=fopen(filename,"wt");
+  if(!out)
+    return 1;
+
+  fprintf(out, "#Output generated by Quantum Walk Simulator (1D)\n");
+
+  lt = time(NULL);
+  fprintf(out, "# %s\n\n",ctime(&lt));
+
+  fprintf(out,"# Simulation options (1D):\n");
+
+  switch(options.coinType){
+  case HADAMARD_COIN: 
+    fprintf(out,"#  Hadamard coin.\n");
+    break;
+  case CUSTOM_COIN:
+    fprintf(out,"#  Customized coin (given by input file).\n");
+  }
+
+  switch(options.stateType){
+  case HADAMARD_STATE: 
+    fprintf(out,"#  Using a state that gives maximum spread for Hadamard coin.\n");
+    break;
+  case CUSTOM_STATE:
+    fprintf(out,"#  Customized state (given by input file).\n");
+  }
+
+  fprintf(out,"#  Lattice type: ");
+  switch(options.lattType){
+  case LINE_LATT: 
+    fprintf(out,"LINE.\n");
+    break;
+  case CYCLE_LATT:
+    fprintf(out,"CYCLE.\n");
+    break;
+  case SEGMENT_LATT:
+    fprintf(out,"SEGMENT.\n");
+    break;
+  }
+
+  fprintf(out,"#  Probability of broken links: %f\n", options.blProb);
+  fprintf(out,"#  Probability of measurement: %f\n", options.dtProb);
+  fprintf(out,"#  Number of experiments: %d\n", options.numOfExperiments);
+  fprintf(out,"#  Number of steps: %d\n", options.steps);
+  if(options.calcMix)
+    fprintf(out,"#  Steps to approximate stationary distribution: %d\n", 
+	    options.stepsMix);
+
+  if(options.lattType == LINE_LATT)
+    fprintf(out,"#  Lattice size: -%d..%d in X axis.\n",MAX,MAX);
+  else
+    fprintf(out,"#  Lattice size: 0..%d in X axis (%d sites).\n",MAX-1, MAX);
+
+  if(options.checkState)
+    fprintf(out,"#  Sum of probabilities checked in each iteration.\n");
+  if(options.checkSymmetry)
+    fprintf(out,"#  Symmetry of probability array checked in each iteration.\n");
+  fprintf(out,"#  Random seed: %d\n\n", options.seed);
+
+  fprintf(out,"# m\t j\t Re(amplitude)\t Im(amplitude)\n\n");
+  
+  if(options.lattType == LINE_LATT){
+    for(m=0; m<=2*MAX; m++){
+      for(j=0; j<2; j++){
+	if(cabs(wave[j][m])>0.0)
+	  fprintf(out,"%d\t %d\t %e\t %e\n",m-MAX,j,creal(wave[j][m]),cimag(wave[j][m]));
+      }
+    }
+    fprintf(out,"\n");
+  }
+  else{
+    for(m=0; m<MAX; m++){
+      for(j=0; j<2; j++){
+	if(cabs(wave[j][m])>0.0)
+	  fprintf(out,"%d\t %d\t %e\t %e\n",m,j,creal(wave[j][m]),cimag(wave[j][m]));
+      }
+    }
+  }
+  fclose(out);
+
+  return 0;
+}
+
+
+
+int writeState2D(const char *filename, double complex ****wave, options2D_t options){
+  FILE *out;
+  int m, n, j, k;
+  time_t lt;
+  const int MAX = options.max;
+  const int auxsize = (options.lattType == CYCLE_LATT) ? MAX : 2*MAX+1;
+
+  out=fopen(filename,"wt");
+  if(!out)
+    return 1;
+
+  fprintf(out, "#Output generated by Quantum Walk Simulator (2D)\n");
+
+  lt = time(NULL);
+  fprintf(out, "# %s\n\n",ctime(&lt));
+
+  fprintf(out,"# Simulation options (2D):\n");
+
+  switch(options.coinType){
+  case HADAMARD_COIN: 
+    fprintf(out,"#  Hadamard coin.\n");
+    break;
+  case GROVER_COIN:
+    fprintf(out,"#  Grover coin.\n");
+    break;
+  case FOURIER_COIN:
+    fprintf(out,"#  Fourier coin.\n");
+    break;
+  case CUSTOM_COIN:
+    fprintf(out,"#  Customized coin (given by input file).\n");
+  }
+
+  switch(options.stateType){
+  case HADAMARD_STATE: 
+    fprintf(out,"#  Using the state that gives maximum spread for Hadamard coin.\n");
+    break;
+  case GROVER_STATE:
+    fprintf(out,"#  Using the state that gives maximum spread for Grover coin.\n");
+    break;
+  case FOURIER_STATE:
+    fprintf(out,"#  Using the state that gives maximum spread for Fourier coin.\n");
+    break;
+  case CUSTOM_STATE:
+    fprintf(out,"#  Customized state (given by input file).\n");
+  }
+
+  fprintf(out,"#  Lattice type: ");
+  switch(options.lattType){
+  case DIAG_LATT: 
+    fprintf(out,"DIAGONAL.\n");
+    break;
+  case NATURAL_LATT:
+    fprintf(out,"NATURAL (default).\n");
+    break;
+  case CYCLE_LATT:
+    fprintf(out,"CYCLE.\n");
+    break;
+  }
+
+
+  if(options.blType==PERMANENT_BROKENLINKS)
+    fprintf(out,"#  Using permanent broken links (topology given by input file).\n");
+  if(options.checkState)
+    fprintf(out,"#  Sum of probabilities checked in each iteration.\n");
+  if(options.checkXSymmetry)
+    fprintf(out,"#  x-Symmetry of probability matrix checked in each iteration.\n");
+  if(options.checkYSymmetry)
+    fprintf(out,"#  y-Symmetry of probability matrix checked in each iteration.\n");
+
+  fprintf(out,"#  Probability of broken links: %f, %f\n", options.blProbA, options.blProbB);
+  fprintf(out,"#  Probability of measurement: %f\n", options.dtProb);
+  fprintf(out,"#  Number of experiments: %d\n", options.numOfExperiments);
+  fprintf(out,"#  Number of steps: %d\n", options.steps);
+  if(options.calcMix)
+    fprintf(out,"#  Steps to approximate stationary distribution: %d\n", 
+	    options.stepsMix);
+
+  if(options.lattType == CYCLE_LATT)
+    fprintf(out,"#  Lattice size: 0..%d in X axis and 0..%d in Y axis.\n",
+	    MAX,MAX);
+  else
+    fprintf(out,"#  Lattice size: -%d..%d in X axis and -%d..%d in Y axis.\n",
+	    MAX,MAX,MAX,MAX);
+
+
+  fprintf(out,"#  Random seed: %d\n\n", options.seed);
+
+  fprintf(out,"# m\t n\t j\t k\t Re(amplitude)\t Im(amplitude)\n\n");
+
+  for(m=0; m<auxsize; m++){
+    for(n=0; n<auxsize; n++){
+      int auxm = (options.lattType == CYCLE_LATT) ? m : m-MAX;
+      int auxn = (options.lattType == CYCLE_LATT) ? n : n-MAX;
+
+      for(j=0; j<2; j++){
+	for(k=0; k<2; k++){
+	  if(cabs(wave[j][k][m][n])>0.0)
+	    fprintf(out,"%d\t %d\t %d\t %d\t %e\t %e\n", auxm,auxn,j,k, 
+		    creal(wave[j][k][m][n]), cimag(wave[j][k][m][n]));
+	}
+      }
+    }
+  }
+  
+  fclose(out);
+
+  return 0;
+}

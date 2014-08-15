@@ -1,0 +1,11 @@
+A simple experiment with Grover coin, as in Fig. 4 from
+Physical Review A, 74 (2006).
+
+BEGIN
+COIN GROVER
+STATE GROVER
+LATTYPE DIAGONAL
+CHECK STATEPROB
+STEPS 100
+END
+

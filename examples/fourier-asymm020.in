@@ -1,0 +1,13 @@
+A simple experiment with Hadamard coin, as in Fig. 2 from
+Physical Review A, 74 (2006).
+
+BEGIN 
+ COIN FOURIER
+ STATE FOURIER
+ CHECK STATEPROB 
+ LATTYPE DIAGONAL
+ BLPROB 0.0 0.2
+ STEPS 100 
+END 
+
+
