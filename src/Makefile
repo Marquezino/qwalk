@@ -39,16 +39,10 @@ QW1D_OBJS = $(libdir)/qw1d.o $(libdir)/qw1d_sub.o
 PROG_QW2D = $(bindir)/qw2d
 QW2D_OBJS = $(libdir)/qw2d.o $(libdir)/qw2d_sub.o
 
-PROG_AKR = $(bindir)/akr
-AKR_OBJS = $(libdir)/akr.o $(libdir)/qw2d_sub.o
-
-PROG_AKRR = $(bindir)/akrr
-AKRR_OBJS = $(libdir)/akrr.o $(libdir)/qw2d_sub.o
-
 PROG_QWAMPL = $(bindir)/qwamplify
 QWAMPL_OBJS = $(libdir)/qwamplify.o
 
-PROGS = $(PROG_QW1D) $(PROG_QW2D) $(PROG_QWAMPL) $(PROG_AKR) $(PROG_AKRR)
+PROGS = $(PROG_QW1D) $(PROG_QW2D) $(PROG_QWAMPL)
 
 all:	$(LIB_FILE) $(PROGS)
 
@@ -57,13 +51,6 @@ $(PROG_QW2D):	$(QW2D_OBJS) $(LIB_FILE)
 
 $(PROG_QW1D):	$(QW1D_OBJS) $(LIB_FILE)
 	$(CC) $(QW1D_OBJS) $(LINK) $(CFLAGS) -o $(PROG_QW1D)
-
-$(PROG_AKR):	$(AKR_OBJS) $(LIB_FILE)
-	$(CC) $(AKR_OBJS) $(LINK) $(CFLAGS) -o $(PROG_AKR)
-
-$(PROG_AKRR):	$(AKRR_OBJS) $(LIB_FILE)
-	$(CC) $(AKRR_OBJS) $(LINK) $(CFLAGS) -o $(PROG_AKRR)
-
 
 $(PROG_QWAMPL):	$(QWAMPL_OBJS)
 	$(CC) $(QWAMPL_OBJS) $(LINK) $(CFLAGS) -o $(PROG_QWAMPL)
